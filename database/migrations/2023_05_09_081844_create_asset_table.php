@@ -37,7 +37,7 @@ class CreateAssetTable extends Migration
 
             $table->foreign('asset_type_id')->references('id')->on('asset_type');
             $table->foreign('asset_model_id')->references('id')->on('asset_model');
-            $table->foreign('department_id')->references('id')->on('department');
+            $table->foreign('department_id')->references('id')->on('department_name');
             $table->foreign('employee_id')->references('id')->on('employee');
             $table->foreign('asset_location_id')->references('id')->on('asset_location');
             $table->foreign('vendor_id')->references('id')->on('vendor');

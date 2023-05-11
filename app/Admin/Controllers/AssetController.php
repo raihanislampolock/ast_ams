@@ -27,23 +27,23 @@ class AssetController extends AdminController
         $grid = new Grid(new Asset());
 
         $grid->column('id', __('Id'));
-        $grid->column('asset_type_id', __('Asset type id'));
-        $grid->column('asset_model_id', __('Asset model id'));
+        
+        $grid->AssetTypefk()->asset_type_name('Asset Name');
+        $grid->AssetModelfk()->model_name('Model');
         $grid->column('asset_configuration', __('Asset configuration'));
         $grid->column('asset_sn_number', __('Asset sn number'));
-        $grid->column('department_id', __('Department id'));
-        $grid->column('employee_id', __('Employee id'));
+        $grid->Departmentfk()->name('Department Name');
+        $grid->Employeefk()->emp_id('Employee ID');
+        $grid->Employeefk()->emp_name('Employee Name');
         $grid->column('assign_date', __('Assign date'));
         $grid->column('tagging_code', __('Tagging code'));
-        $grid->column('asset_location_id', __('Asset location id'));
-        $grid->column('vendor_id', __('Vendor id'));
-        $grid->column('asset_transactions_id', __('Asset transactions id'));
-        $grid->column('manufacturer_id', __('Manufacturer id'));
+        $grid->AssetLocationfk()->asset_location('Asset Location');
+        $grid->Vendorfk()->company_name('Vendor Name');
+        $grid->AssetTransactionsfk()->asset_price('Asset Price');
+        $grid->Manufacturerfk()->name('Manufacturer Name');
         $grid->column('servicing_date', __('Servicing date'));
         $grid->column('remarks', __('Remarks'));
         $grid->column('cd', __('Cd'));
-
-        $grid->model()->orderBy('id', 'desc');
 
         return $grid;
     }
@@ -75,8 +75,8 @@ class AssetController extends AdminController
         $show->field('remarks', __('Remarks'));
         $show->field('cb', __('Cb'));
         $show->field('cd', __('Cd'));
-        $show->field('ub', __('Ub'));
-        $show->field('ud', __('Ud'));
+        $show->field('ub', __('ub'));
+        $show->field('ud', __('ud'));
 
         return $show;
     }
@@ -90,18 +90,40 @@ class AssetController extends AdminController
     {
         $form = new Form(new Asset());
 
-        $form->number('asset_type_id', __('Asset type id'));
-        $form->number('asset_model_id', __('Asset model id'));
+        $AssetType = \App\Models\Asset_Type::pluck('asset_type_name', 'id')->toArray();
+        $form->select('asset_type_id', __('Asset Type'))->options($AssetType);
+        
+        $Model = \App\Models\Asset_Model::pluck('model_name', 'id')->toArray();
+        $form->select('asset_model_id', __('Model Name'))->options($Model);
+        
         $form->text('asset_configuration', __('Asset configuration'));
         $form->text('asset_sn_number', __('Asset sn number'));
-        $form->number('department_id', __('Department id'));
-        $form->number('employee_id', __('Employee id'));
+
+        $Department = \App\Models\Department_Name::pluck('name', 'id')->toArray();
+        $form->select('department_id', __('Department Name'))->options($Department);
+
+        $Emp = \App\Models\Employee::all()->map(function ($emp) {
+            return [
+                'id' => $emp->id,
+                'label' => "{$emp->emp_id} - {$emp->emp_name}",
+            ];
+        })->pluck('label', 'id')->toArray();
+        $form->select('employee_id', __('Employee ID & Name'))->options($Emp);
+
         $form->date('assign_date', __('Assign date'))->default(date('Y-m-d'));
         $form->textarea('tagging_code', __('Tagging code'));
-        $form->number('asset_location_id', __('Asset location id'));
-        $form->number('vendor_id', __('Vendor id'));
-        $form->number('asset_transactions_id', __('Asset transactions id'));
-        $form->number('manufacturer_id', __('Manufacturer id'));
+
+        $Loc = \App\Models\Asset_Location::pluck('asset_location', 'id')->toArray();
+        $form->select('asset_location_id', __('Asset Location'))->options($Loc);
+
+        $Vendor = \App\Models\Vendor::pluck('company_name', 'id')->toArray();
+        $form->select('vendor_id', __('Vendor Name'))->options($Vendor);
+
+        $tran = \App\Models\Asset_Transactions::pluck('asset_price', 'id')->toArray();
+        $form->select('asset_transactions_id', __('Asset Price'))->options($tran);
+
+        $Manu = \App\Models\Manufacturer::pluck('name', 'id')->toArray();
+        $form->select('manufacturer_id', __('Manufacturer'))->options($Manu);
         $form->date('servicing_date', __('Servicing date'))->default(date('Y-m-d'));
         $form->text('remarks', __('Remarks'));
         $form->hidden('cb', __('Cb'))->value(auth()->user()->name);
