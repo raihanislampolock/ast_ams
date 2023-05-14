@@ -16,6 +16,7 @@ class CreateDepartmentNameTable extends Migration
         Schema::create('department_name', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
+            $table->string('short_name', 255);
             $table->string('cb', 255)->nullable();
             $table->timestamp('cd')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->string('ub', 255)->nullable();

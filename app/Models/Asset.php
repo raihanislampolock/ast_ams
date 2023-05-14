@@ -21,16 +21,6 @@ class Asset extends Model
         return $this->hasOne(Asset_Model::class, 'id', 'asset_model_id');
     }
     
-    public function Departmentfk()
-    {
-        return $this->hasOne(Department_Name::class, 'id', 'department_id');
-    }
-
-    public function Employeefk()
-    {
-        return $this->hasOne(Employee::class, 'id', 'employee_id');
-    }
-    
     public function AssetLocationfk()
     {
         return $this->hasOne(Asset_Location::class, 'id', 'asset_location_id');

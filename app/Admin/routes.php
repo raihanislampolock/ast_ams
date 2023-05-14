@@ -23,5 +23,7 @@ Route::group([
     Route::resource('employee', EmployeeController::class);
     Route::resource('manufacturer', ManufacturerController::class);
     Route::resource('vendor', VendorController::class);
+    Route::resource('asset-tracking', AssetTrackingController::class);
+
 
 });

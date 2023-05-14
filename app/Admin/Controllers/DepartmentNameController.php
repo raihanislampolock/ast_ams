@@ -28,9 +28,8 @@ class DepartmentNameController extends AdminController
 
         $grid->column('id', __('Id'));
         $grid->column('name', __('Name'));
+        $grid->column('short_name', __('Short name'));
         $grid->column('cd', __('Cd'));
-
-        $grid->model()->orderBy('id', 'desc');
 
         return $grid;
     }
@@ -47,10 +46,8 @@ class DepartmentNameController extends AdminController
 
         $show->field('id', __('Id'));
         $show->field('name', __('Name'));
-        $show->field('cb', __('Cb'));
+        $show->field('short_name', __('Short name'));
         $show->field('cd', __('Cd'));
-        $show->field('ub', __('Ub'));
-        $show->field('ud', __('Ud'));
 
         return $show;
     }
@@ -65,6 +62,7 @@ class DepartmentNameController extends AdminController
         $form = new Form(new Department_Name());
 
         $form->text('name', __('Name'));
+        $form->text('short_name', __('Short name'));
         $form->hidden('cb', __('Cb'))->value(auth()->user()->name);
         $form->hidden('ub', __('Ub'))->value(auth()->user()->name);
 
