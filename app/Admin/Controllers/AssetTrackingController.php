@@ -9,6 +9,8 @@ use Encore\Admin\Controllers\AdminController;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Show;
+Use Encore\Admin\Admin;
+use Illuminate\Http\Request;
 
 class AssetTrackingController extends AdminController
 {
@@ -33,9 +35,7 @@ class AssetTrackingController extends AdminController
         $grid->Employeefk()->emp_id('Employee ID');
         $grid->Employeefk()->emp_name('Employee Name');
         $grid->SNNumberfk()->asset_sn_number('Asset SN Number');
-        //$grid->SNNumberfk()->asset_type_id('Asset Type');
         $grid->column('SNNumberfk.asset_model_id','Asset Model')->display(function ($asset_model_id ) {
-            //dd($asset_model_id );
             $assetModel=Asset_Model::find($asset_model_id);
              $model_name=$assetModel->model_name??'N/A';
              $assetType=Asset_Type::find($assetModel->asset_type_id);
@@ -44,10 +44,13 @@ class AssetTrackingController extends AdminController
             return $model_name.' ( '.$asset_type_name.')';
         });
 
-        $grid->addColumn('DepartmentAndTagging', function () use ($grid) {
-            return ($grid->Departmentfk()->short_name ?? '') . ' ' . ($grid->SNNumberfk()->tagging_code ?? '');
-        });
-    
+        $grid->addColumn('Department & Tagging', 'Department & Tagging Marge')->display(function ()
+        {
+            $department = $this->Departmentfk->short_name;
+            $taggingCode = $this->SNNumberfk->tagging_code;
+            return $department . '-' . $taggingCode;});
+        
+        $grid->AssetLocationfk()->asset_location('Asset Location');        
         $grid->column('assign_date', __('Assign date'));
         $grid->column('cd', __('Cd'));
 
@@ -70,6 +73,7 @@ class AssetTrackingController extends AdminController
         $show->field('emp_id', __('Emp id'));
         $show->field('sn_id', __('Sn id'));
         $show->field('assign_date', __('Assign date'));
+        $show->field('asset_location_id', __('Asset location id'));
         $show->field('cb', __('Cb'));
         $show->field('cd', __('Cd'));
         $show->field('ub', __('Ub'));
@@ -97,9 +101,35 @@ class AssetTrackingController extends AdminController
             ];
         })->pluck('label', 'id')->toArray();
         $form->select('emp_id', __('Employee ID & Name'))->options($Emp);
+
+        $Assets = \App\Models\Asset::all();
+        $Type = [];
+        foreach ($Assets as $asset) {
+            $Type[$asset->AssetTypefk->asset_type_name] = $asset->AssetTypefk->asset_type_name;
+        }
         
-        $SNNumber = \App\Models\Asset::pluck('asset_sn_number', 'id')->toArray();
-        $form->select('sn_id', __('SN Number'))->options($SNNumber);
+        $form->select('sn_id', __('Asset Type'))->options(function ($id) use ($Type) {
+            $type = \App\Models\Asset_Type::find($id);
+            if ($type) {
+                return [$type->id => $type->asset_type_name];
+            }
+        })->ajax('admin/api/type');
+
+        
+
+
+        $SNNumber = [];
+        $submittedSNNumbers = Asset_Tracking::pluck('sn_id')->toArray();
+        
+        foreach ($Assets as $asset) {
+            $SNNumber[$asset->id] = $asset->asset_sn_number . ' (' . $asset->AssetModelfk->model_name . ')';
+        }
+        $filteredSNNumber = array_diff_key($SNNumber, array_flip($submittedSNNumbers));
+        $form->select('sn_id', __('SN Number'))->options($filteredSNNumber);
+        
+
+        $Loc = \App\Models\Asset_Location::pluck('asset_location', 'id')->toArray();
+        $form->select('asset_location_id', __('Asset Location'))->options($Loc);
 
         $form->date('assign_date', __('Assign date'))->default(date('Y-m-d'));
         $form->hidden('cb', __('Cb'))->value(auth()->user()->name);
@@ -107,4 +137,10 @@ class AssetTrackingController extends AdminController
 
         return $form;
     }
+    public function type(Request $request)
+    {
+        $q = $request->get('q');
+        return Asset_Type::where('asset_type_name', 'like', "%$q%");
+    }
+
 }

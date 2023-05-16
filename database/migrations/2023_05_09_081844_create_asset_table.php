@@ -20,7 +20,6 @@ class CreateAssetTable extends Migration
             $table->string('asset_configuration', 255)->nullable();
             $table->string('asset_sn_number', 255)->nullable();
             $table->text('tagging_code')->nullable();
-            $table->unsignedbiginteger('asset_location_id');
             $table->unsignedbiginteger('vendor_id');
             $table->unsignedbiginteger('asset_transactions_id');
             $table->unsignedbiginteger('manufacturer_id');
@@ -34,7 +33,6 @@ class CreateAssetTable extends Migration
 
             $table->foreign('asset_type_id')->references('id')->on('asset_type');
             $table->foreign('asset_model_id')->references('id')->on('asset_model');
-            $table->foreign('asset_location_id')->references('id')->on('asset_location');
             $table->foreign('vendor_id')->references('id')->on('vendor');
             $table->foreign('asset_transactions_id')->references('id')->on('asset_transactions');
             $table->foreign('manufacturer_id')->references('id')->on('manufacturer');

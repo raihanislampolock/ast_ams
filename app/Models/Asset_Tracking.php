@@ -26,7 +26,9 @@ class Asset_Tracking extends Model
         return $this->hasOne(Asset::class, 'id', 'sn_id');
     }
 
-   
-
+    public function AssetLocationfk()
+    {
+        return $this->hasOne(Asset_Location::class, 'id', 'asset_location_id');
+    }
 
 }

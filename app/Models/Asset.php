@@ -20,11 +20,6 @@ class Asset extends Model
     {
         return $this->hasOne(Asset_Model::class, 'id', 'asset_model_id');
     }
-    
-    public function AssetLocationfk()
-    {
-        return $this->hasOne(Asset_Location::class, 'id', 'asset_location_id');
-    }
 
     public function Vendorfk()
     {
