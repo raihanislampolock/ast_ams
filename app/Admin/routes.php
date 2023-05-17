@@ -18,12 +18,11 @@ Route::group([
     Route::resource('asset-model', AssetModelController::class);
     Route::resource('asset-transactions', AssetTransactionsController::class);
     Route::resource('asset-type', AssetTypeController::class);
-    Route::resource('department', DepartmentController::class);
     Route::resource('department-name', DepartmentNameController::class);
     Route::resource('employee', EmployeeController::class);
     Route::resource('manufacturer', ManufacturerController::class);
     Route::resource('vendor', VendorController::class);
     Route::resource('asset-tracking', AssetTrackingController::class);
 
-
+    $router->get('get-sn', 'AssetTrackingController@getSn');
 });

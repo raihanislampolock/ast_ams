@@ -17,8 +17,9 @@ class CreateAssetTrackingTable extends Migration
             $table->id();
             $table->unsignedbiginteger('department_id');
             $table->unsignedbiginteger('emp_id');
-            $table->unsignedbiginteger('sn_id');
+            $table->unsignedbiginteger('asset_id');
             $table->date('assign_date');
+            $table->unsignedbiginteger('asset_location_id');
             $table->string('cb', 255)->nullable();
             $table->timestamp('cd')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->string('ub', 255)->nullable();
@@ -26,7 +27,8 @@ class CreateAssetTrackingTable extends Migration
 
             $table->foreign('department_id')->references('id')->on('department_name');
             $table->foreign('emp_id')->references('id')->on('employee');
-            $table->foreign('sn_id')->references('id')->on('asset');
+            $table->foreign('asset_id')->references('id')->on('asset');
+            $table->foreign('asset_location_id')->references('id')->on('asset_location');
 
         });
     }

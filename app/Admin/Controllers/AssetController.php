@@ -32,10 +32,10 @@ class AssetController extends AdminController
         $grid->column('asset_configuration', __('Asset configuration'));
         $grid->column('asset_sn_number', __('Asset sn number'));
         $grid->column('tagging_code', __('Tagging code'));
-        $grid->AssetLocationfk()->asset_location('Asset Location');
         $grid->Vendorfk()->company_name('Vendor Name');
         $grid->AssetTransactionsfk()->asset_price('Asset Price');
         $grid->Manufacturerfk()->name('Manufacturer Name');
+        $grid->column('mac_address', __('Mac Address'));
         $grid->column('servicing_date', __('Servicing date'));
         $grid->column('remarks', __('Remarks'));
         $grid->column('cd', __('Cd'));
@@ -60,7 +60,6 @@ class AssetController extends AdminController
         $show->field('asset_configuration', __('Asset configuration'));
         $show->field('asset_sn_number', __('Asset sn number'));
         $show->field('tagging_code', __('Tagging code'));
-        $show->field('asset_location_id', __('Asset location id'));
         $show->field('vendor_id', __('Vendor id'));
         $show->field('asset_transactions_id', __('Asset transactions id'));
         $show->field('manufacturer_id', __('Manufacturer id'));
@@ -89,15 +88,14 @@ class AssetController extends AdminController
         $form->select('asset_model_id', __('Model Name'))->options($Model);
         $form->text('asset_configuration', __('Asset configuration'));
         $form->text('asset_sn_number', __('Asset sn number'));
-        $form->textarea('tagging_code', __('Tagging code'))->default(time());
-        $Loc = \App\Models\Asset_Location::pluck('asset_location', 'id')->toArray();
-        $form->select('asset_location_id', __('Asset Location'))->options($Loc);
+        $form->text('tagging_code', __('Tagging code'))->default(time())->readonly();
         $Vendor = \App\Models\Vendor::pluck('company_name', 'id')->toArray();
         $form->select('vendor_id', __('Vendor Name'))->options($Vendor);
         $tran = \App\Models\Asset_Transactions::pluck('asset_price', 'id')->toArray();
         $form->select('asset_transactions_id', __('Asset Price'))->options($tran);
         $Manu = \App\Models\Manufacturer::pluck('name', 'id')->toArray();
         $form->select('manufacturer_id', __('Manufacturer'))->options($Manu);
+        $form->text('mac_address', __('Mac Address'));
         $form->date('servicing_date', __('Servicing date'));
         $form->text('remarks', __('Remarks'));
         $form->hidden('cb', __('Cb'))->value(auth()->user()->name);

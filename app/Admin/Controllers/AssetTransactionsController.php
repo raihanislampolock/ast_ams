@@ -77,7 +77,7 @@ class AssetTransactionsController extends AdminController
         $form->text('asset_price', __('Asset price'));
         $form->date('asset_purchase_date', __('Asset purchase date'))->default(date('Y-m-d'));
         $form->text('asset_purchase_order', __('Asset purchase order'));
-        $form->date('asset_warranty_date', __('Asset warranty date'))->default(date('Y-m-d'));
+        $form->date('asset_warranty_date', __('Asset warranty date'));
         $form->hidden('cb', __('Cb'))->value(auth()->user()->name);
         $form->hidden('ub', __('Ub'))->value(auth()->user()->name);
 
