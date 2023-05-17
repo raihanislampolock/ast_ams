@@ -19,7 +19,7 @@ class AssetTrackingController extends AdminController
      *
      * @var string
      */
-    protected $title = 'Asset_Tracking';
+    protected $title = 'Asset Tracking';
 
     /**
      * Make a grid builder.
@@ -34,16 +34,35 @@ class AssetTrackingController extends AdminController
         $grid->Departmentfk()->name('Department');
         $grid->Employeefk()->emp_id('Employee ID');
         $grid->Employeefk()->emp_name('Employee Name');
+
+        $grid->SNNumberfk()->asset_sn_number('Asset SN Number');
+        $grid->column('SNNumberfk.asset_model_id', 'Asset Model')->display(function ($asset_model_id)
+        {
+            $assetModel = Asset_Model::find($asset_model_id);
+            $model_name = $assetModel->model_name??'N/A';
+            $assetType = Asset_Type::find($assetModel->asset_type_id);
+            $asset_type_name = $assetType->asset_type_name ??'N/A';
+
         $grid->SNNumberfk()->asset_sn_number('Asset SN');
         $grid->column('SNNumberfk.asset_model_id','Asset Model')->display(function ($asset_model_id ) {
             $assetModel=Asset_Model::find($asset_model_id);
              $model_name=$assetModel->model_name??'N/A';
              $assetType=Asset_Type::find($assetModel->asset_type_id);
             $asset_type_name =$assetType->asset_type_name ??'N/A';           
+
             
             return $model_name.' ( '.$asset_type_name.')';
         });
 
+        $grid->addColumn('Department & Tagging')->display(function ()
+        {
+            $department = $this->Departmentfk->short_name;
+            $taggingCode = $this->SNNumberfk->tagging_code;
+            return $department . '-' . $taggingCode;
+        });
+    
+        $grid->column('assign_date', __('Assign date'));
+        
         $grid->addColumn('Department & Tagging', 'Department & Tagging Marge')->display(function ()
         {
             $department = $this->Departmentfk->short_name;
@@ -54,6 +73,7 @@ class AssetTrackingController extends AdminController
         $grid->column('assign_date', __('Assign date'));
         $grid->column('remarks', __('Remarks'));
         $grid->SNNumberfk()->mac_address('Mac Address');
+
         $grid->column('cd', __('Cd'));
 
         return $grid;
@@ -128,7 +148,9 @@ class AssetTrackingController extends AdminController
         $form->select('asset_location_id', __('Asset Location'))->options($Loc);
 
         $form->date('assign_date', __('Assign date'))->default(date('Y-m-d'));
+      
         $form->text('remarks', __('Remarks'));
+
         $form->hidden('cb', __('Cb'))->value(auth()->user()->name);
         $form->hidden('ub', __('Ub'))->value(auth()->user()->name);
         $form->submitted(function (Form $form) {
