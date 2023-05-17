@@ -34,7 +34,7 @@ class AssetTrackingController extends AdminController
         $grid->Departmentfk()->name('Department');
         $grid->Employeefk()->emp_id('Employee ID');
         $grid->Employeefk()->emp_name('Employee Name');
-        $grid->SNNumberfk()->asset_sn_number('Asset SN Number');
+        $grid->SNNumberfk()->asset_sn_number('Asset SN');
         $grid->column('SNNumberfk.asset_model_id','Asset Model')->display(function ($asset_model_id ) {
             $assetModel=Asset_Model::find($asset_model_id);
              $model_name=$assetModel->model_name??'N/A';
@@ -54,7 +54,6 @@ class AssetTrackingController extends AdminController
         $grid->column('assign_date', __('Assign date'));
         $grid->column('cd', __('Cd'));
 
-
         return $grid;
     }
 
@@ -71,7 +70,7 @@ class AssetTrackingController extends AdminController
         $show->field('id', __('Id'));
         $show->field('department_id', __('Department id'));
         $show->field('emp_id', __('Emp id'));
-        $show->field('sn_id', __('Sn id'));
+        $show->field('asset_id', __('Asset id'));
         $show->field('assign_date', __('Assign date'));
         $show->field('asset_location_id', __('Asset location id'));
         $show->field('cb', __('Cb'));
@@ -102,31 +101,26 @@ class AssetTrackingController extends AdminController
         })->pluck('label', 'id')->toArray();
         $form->select('emp_id', __('Employee ID & Name'))->options($Emp);
 
-        $Assets = \App\Models\Asset::all();
+        $AssetTypes = \App\Models\Asset_Type::all();
+        
         $Type = [];
-        foreach ($Assets as $asset) {
-            $Type[$asset->AssetTypefk->asset_type_name] = $asset->AssetTypefk->asset_type_name;
+        foreach ($AssetTypes as $assetType) {
+            $Type[$assetType->id] = $assetType->asset_type_name;
         }
         
-        $form->select('sn_id', __('Asset Type'))->options(function ($id) use ($Type) {
-            $type = \App\Models\Asset_Type::find($id);
-            if ($type) {
-                return [$type->id => $type->asset_type_name];
-            }
-        })->ajax('admin/api/type');
-
-        
-
+        $form->select('asset_type_id', __('Asset Type'))->options($Type)->load('asset_id', '/admin/get-sn');
 
         $SNNumber = [];
-        $submittedSNNumbers = Asset_Tracking::pluck('sn_id')->toArray();
+        $submittedSNNumbers = Asset_Tracking::pluck('asset_id')->toArray();
         
+        $Assets = \App\Models\Asset::all();
+
         foreach ($Assets as $asset) {
             $SNNumber[$asset->id] = $asset->asset_sn_number . ' (' . $asset->AssetModelfk->model_name . ')';
         }
         $filteredSNNumber = array_diff_key($SNNumber, array_flip($submittedSNNumbers));
-        $form->select('sn_id', __('SN Number'))->options($filteredSNNumber);
-        
+
+        $form->select('asset_id', __('SN Number'))->options($filteredSNNumber);
 
         $Loc = \App\Models\Asset_Location::pluck('asset_location', 'id')->toArray();
         $form->select('asset_location_id', __('Asset Location'))->options($Loc);
@@ -134,13 +128,35 @@ class AssetTrackingController extends AdminController
         $form->date('assign_date', __('Assign date'))->default(date('Y-m-d'));
         $form->hidden('cb', __('Cb'))->value(auth()->user()->name);
         $form->hidden('ub', __('Ub'))->value(auth()->user()->name);
+        $form->submitted(function (Form $form) {
+            $form->ignore('asset_type_id');
+        });
 
         return $form;
     }
-    public function type(Request $request)
-    {
-        $q = $request->get('q');
-        return Asset_Type::where('asset_type_name', 'like', "%$q%");
+
+    public function getSn(Request $request) {
+        $assetTypeId = $request->get('q');
+        $sns = \App\Models\Asset::where('asset_type_id', $assetTypeId)->get();
+        // dd($sns);
+        $SNNumber = [];
+        $submittedSNNumbers = Asset_Tracking::pluck('asset_id')->toArray();
+        foreach ($sns as $sn) {
+            $SNNumber[$sn->id] = $sn->asset_sn_number . ' (' . $sn->AssetModelfk->model_name . ')';
+        }
+        $filteredSNNumber = array_diff_key($SNNumber, array_flip($submittedSNNumbers));
+        $filteredSNNumber=$this->formatCascading($filteredSNNumber);
+        return $filteredSNNumber;
     }
 
+    public function formatCascading($data=[]){
+        $response=[];
+        foreach ($data as $key => $value) {
+            $response[]=['id'=>$key,'text'=>$value];
+        
+        }
+
+        return $response;
+        
+    }
 }

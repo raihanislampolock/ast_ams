@@ -23,7 +23,7 @@ class Asset_Tracking extends Model
 
     public function SNNumberfk()
     {
-        return $this->hasOne(Asset::class, 'id', 'sn_id');
+        return $this->hasOne(Asset::class, 'id', 'asset_id');
     }
 
     public function AssetLocationfk()
