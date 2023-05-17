@@ -35,6 +35,7 @@ class AssetController extends AdminController
         $grid->Vendorfk()->company_name('Vendor Name');
         $grid->AssetTransactionsfk()->asset_price('Asset Price');
         $grid->Manufacturerfk()->name('Manufacturer Name');
+        $grid->column('mac_address', __('Mac Address'));
         $grid->column('servicing_date', __('Servicing date'));
         $grid->column('remarks', __('Remarks'));
         $grid->column('cd', __('Cd'));
@@ -94,6 +95,7 @@ class AssetController extends AdminController
         $form->select('asset_transactions_id', __('Asset Price'))->options($tran);
         $Manu = \App\Models\Manufacturer::pluck('name', 'id')->toArray();
         $form->select('manufacturer_id', __('Manufacturer'))->options($Manu);
+        $form->text('mac_address', __('Mac Address'));
         $form->date('servicing_date', __('Servicing date'));
         $form->text('remarks', __('Remarks'));
         $form->hidden('cb', __('Cb'))->value(auth()->user()->name);
