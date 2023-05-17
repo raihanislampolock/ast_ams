@@ -25,8 +25,4 @@ class Asset_Tracking extends Model
     {
         return $this->hasOne(Asset::class, 'id', 'sn_id');
     }
-
-   
-
-
 }
