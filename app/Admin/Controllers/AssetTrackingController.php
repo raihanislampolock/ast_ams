@@ -34,12 +34,14 @@ class AssetTrackingController extends AdminController
         $grid->Departmentfk()->name('Department');
         $grid->Employeefk()->emp_id('Employee ID');
         $grid->Employeefk()->emp_name('Employee Name');
+
         $grid->SNNumberfk()->asset_sn_number('Asset SN');
+        $grid->SNNumberfk()->asset_sn_number('Asset SN Number');
         $grid->column('SNNumberfk.asset_model_id','Asset Model')->display(function ($asset_model_id ) {
             $assetModel=Asset_Model::find($asset_model_id);
              $model_name=$assetModel->model_name??'N/A';
              $assetType=Asset_Type::find($assetModel->asset_type_id);
-            $asset_type_name =$assetType->asset_type_name ??'N/A';           
+            $asset_type_name =$assetType->asset_type_name ??'N/A';
             
             return $model_name.' ( '.$asset_type_name.')';
         });
@@ -48,9 +50,14 @@ class AssetTrackingController extends AdminController
         {
             $department = $this->Departmentfk->short_name;
             $taggingCode = $this->SNNumberfk->tagging_code;
+
             return $department . '-' . $taggingCode;});
         
         $grid->AssetLocationfk()->asset_location('Asset Location');        
+
+            return $department . ' - ' . $taggingCode;
+        });
+    
         $grid->column('assign_date', __('Assign date'));
         $grid->column('cd', __('Cd'));
 
@@ -135,6 +142,7 @@ class AssetTrackingController extends AdminController
         return $form;
     }
 
+
     public function getSn(Request $request) {
         $assetTypeId = $request->get('q');
         $sns = \App\Models\Asset::where('asset_type_id', $assetTypeId)->get();
@@ -159,4 +167,6 @@ class AssetTrackingController extends AdminController
         return $response;
         
     }
+}
+
 }
